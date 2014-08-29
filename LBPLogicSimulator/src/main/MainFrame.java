@@ -30,6 +30,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("TestFrame");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setName("mainFrame"); // NOI18N
         setPreferredSize(new java.awt.Dimension(800, 600));
