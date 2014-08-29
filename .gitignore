@@ -1,0 +1,5 @@
+/LBPLogicSimulator/nbproject
+/LBPLogicSimulator/build/
+*.form
+build.xml
+manifest.mf
