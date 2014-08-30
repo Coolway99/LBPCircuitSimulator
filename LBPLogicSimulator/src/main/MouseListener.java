@@ -23,9 +23,9 @@ public class MouseListener extends MouseAdapter{
 		if(e.getSource() instanceof ILogicDraggable){
 			ILogicDraggable source = (ILogicDraggable) e.getSource();
 			Point p = new Point();
-			p.setLocation(source.getLocation().getX() + (oldX - e.getX()),
-					source.getLocation().getY() + (oldY - e.getY()));
-			source.setLocation(p);
+			p.setLocation(source.getDraggableLocation().getX() + (oldX - e.getX()),
+					source.getDraggableLocation().getY() + (oldY - e.getY()));
+			source.setDraggableLocation(p);
 			this.oldX = e.getX();
 			this.oldY = e.getY();
 		}
