@@ -5,7 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import main.interfaces.ILogicDraggable;
 
-public class MouseListener extends MouseAdapter{
+public class LogicMouseListener extends MouseAdapter{
 	private double oldX = 0;
 	private double oldY = 0;
 	@Override
