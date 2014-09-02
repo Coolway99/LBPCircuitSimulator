@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 
 import main.interfaces.ILogicGateComponent;
+import main.interfaces.Signal;
 
 public class AND_Gate extends ILogicGateComponent{
 	public AND_Gate(){
@@ -12,7 +13,21 @@ public class AND_Gate extends ILogicGateComponent{
 	}
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		boolean analog = true;
+		boolean digital = true;
+		double lowestValue = 100;
+		for(int x = 0; x < this.inputs; x++){
+			Signal s = this.inputSignals.get(x);
+			if(s.getAnalog() == 0){
+				analog = false;
+			} else if(Math.abs(s.getAnalog()) < lowestValue){
+				lowestValue = s.getAnalog();
+			}
+			if(!s.getDigital()){
+				digital = false;
+			}
+		}
+		this.sendOutput(0, new Signal((digital) ? true : false, (analog) ? lowestValue : 0));
 	}
 	@Override
 	public boolean areInputsSettable() {
