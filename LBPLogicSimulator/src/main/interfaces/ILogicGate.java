@@ -2,7 +2,10 @@ package main.interfaces;
 
 import java.awt.Rectangle;
 
-/**The base interface for all logic interfacing*/
+import javax.swing.Icon;
+
+/**The base interface that ALL logic gates MUST implement
+ * @category LogicGates*/
 public interface ILogicGate {
 	/**Returns the number of inputs
 	 * @return The number of inputs*/
@@ -51,4 +54,20 @@ public interface ILogicGate {
 	public void connectOutput(int port, ILogicGateComponent toGate);
 	/**Called when another gate makes a connection to this one*/
 	public void connectInput(int port, ILogicGateComponent fromGate);
+	/**Used for getting the image that is stretched on the background of the gate (the outline),
+	 * usually a set default image<br />
+	 * The resolution is 20x20 pixels, however make it as big as you wish, it will be
+	 * rendered at runtime at the correct stretched size
+	 * @return The icon used for the back
+	 * @see getForegroundIcon
+	 * */
+	public Icon getBackgroundIcon();
+	/**Used for getting the image that is static in the middle of the object. Usually a symbol
+	 * representing it.
+	 * The resolution it is rendered at is 15x15 pixels, however if it is bigger/smaller it will be resized
+	 * The image should be white as it will be hue changed to the colors set
+	 * @return The icon used for the front
+	 * @see getBackgroundIcon
+	 */
+	public Icon getForegroundIcon();
 }
