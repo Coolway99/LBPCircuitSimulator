@@ -3,6 +3,7 @@ package main.interfaces;
 import java.awt.Point;
 import java.util.HashMap;
 
+import javax.swing.Icon;
 import javax.swing.event.EventListenerList;
 
 
@@ -10,6 +11,7 @@ import javax.swing.event.EventListenerList;
 /**The base class for all logic.<br />
  * Signal I/O and connections is handled in this class automatically, can be overridden to take control of
  * the Signal I/O, or the connections, however, it is probably not necessary
+ * @category LogicGates
  * @see ILogicDraggable
  * @see ILogicGate*/
 @SuppressWarnings("static-access")
@@ -24,6 +26,7 @@ public abstract class ILogicGateComponent implements ILogicGate, ILogicDraggable
 			new HashMap<Integer, Signal>();
 	protected int inputs;
 	protected int outputs;
+	private int ID = -1;
 	public void addInputListener(int port, LogicInputListener l){
 		inputListenerList.get(port).add(LogicInputListener.class, l);
 	}
@@ -111,4 +114,10 @@ public abstract class ILogicGateComponent implements ILogicGate, ILogicDraggable
 		return this.location;
 	}
 	public abstract void update();
+	public int getID(){
+		return ID;
+	}
+	public void setID(int newID){
+		this.ID = newID;
+	}
 }
