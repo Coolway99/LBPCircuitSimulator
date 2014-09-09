@@ -10,14 +10,14 @@ import javax.swing.event.EventListenerList;
 
 
 
-/**The base class for all logic. All logic gates MUST be extended<br />
+/**The base class for all logic. All logic gates MUST be extend this class<br />
  * Signal I/O and connections is handled in this class automatically, can be overridden to take control of
  * the Signal I/O, or the connections (i.e, randomizer), however, it is probably not necessary
  * @category LogicGates
  * @see ILogicDraggable
  * @see ILogicGate*/
 @SuppressWarnings("static-access")
-public abstract class ILogicGateComponent implements ILogicDraggable, LogicInputListener, LogicOutputListener{
+public abstract class ILogicGate implements ILogicDraggable, LogicInputListener, LogicOutputListener{
 	protected HashMap<Integer, EventListenerList> inputListenerList = 
 			new HashMap<Integer, EventListenerList>();
 	protected HashMap<Integer, EventListenerList> outputListenerList = 
@@ -67,7 +67,7 @@ public abstract class ILogicGateComponent implements ILogicDraggable, LogicInput
 		}
 	}
 	/**Called when another gate makes a connection to this one*/
-	public void connectInput(int port, ILogicGateComponent fromGate) {
+	public void connectInput(int port, ILogicGate fromGate) {
 		this.removeInputListener(port, this.inputListenerList.get(port).getListeners(LogicInputListener.class)[0]);
 		this.addInputListener(port, fromGate);
 	}
@@ -86,7 +86,7 @@ public abstract class ILogicGateComponent implements ILogicDraggable, LogicInput
 		}
 	}
 	/**Called when this gate makes a connection to another*/
-	public void connectOutput(int port, ILogicGateComponent toGate) {
+	public void connectOutput(int port, ILogicGate toGate) {
 		this.addOutputListener(port, toGate);
 	}
 	/**Called when the gate is going to get deleted*/
