@@ -1,12 +1,21 @@
 package main.simpleLogicGates;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Rectangle;
 
-import main.interfaces.ILogicGateComponent;
+import javax.swing.ImageIcon;
+
+import main.Main;
+import main.interfaces.ILogicGate;
 import main.interfaces.Signal;
 
-public class XOR_Gate extends ILogicGateComponent{
+public class XOR_Gate extends ILogicGate{
+	private static Image foregroundImage = new ImageIcon(Main.class.getResource("assets/gateXOR.png")).getImage();
+	public XOR_Gate() {
+		this.inputs = 2;
+		this.outputs = 1;
+	}
 	@Override
 	public boolean areInputsSettable() {
 		return true;
@@ -67,5 +76,9 @@ public class XOR_Gate extends ILogicGateComponent{
 			}
 		}
 		this.sendOutput(0, new Signal(digital, (analog) ? analogSignal : 0));
+	}
+	@Override
+	public Image getForegroundImage() {
+		return XOR_Gate.foregroundImage;
 	}
 }

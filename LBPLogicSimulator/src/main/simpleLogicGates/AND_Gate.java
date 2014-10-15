@@ -1,12 +1,17 @@
 package main.simpleLogicGates;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Rectangle;
 
-import main.interfaces.ILogicGateComponent;
+import javax.swing.ImageIcon;
+
+import main.Main;
+import main.interfaces.ILogicGate;
 import main.interfaces.Signal;
 
-public class AND_Gate extends ILogicGateComponent{
+public class AND_Gate extends ILogicGate{
+	private static Image foregroundImage = new ImageIcon(Main.class.getResource("assets/gateAnd.png")).getImage(); 
 	public AND_Gate(){
 		this.inputs = 2;
 		this.outputs = 1;
@@ -17,17 +22,25 @@ public class AND_Gate extends ILogicGateComponent{
 		boolean digital = true;
 		double lowestValue = 100;
 		for(int x = 0; x < this.inputs; x++){
-			Signal s = this.inputSignals.get(x);
-			if(s.getAnalog() == 0){
-				analog = false;
-			} else if(Math.abs(s.getAnalog()) < lowestValue){
-				lowestValue = s.getAnalog();
-			}
-			if(!s.getDigital()){
-				digital = false;
+			try{
+				Signal s = this.inputSignals.get(x);
+				if(s.getAnalog() == 0){
+					analog = false;
+				} else if(Math.abs(s.getAnalog()) < lowestValue){
+					lowestValue = s.getAnalog();
+				}
+				if(!s.getDigital()){
+					digital = false;
+				}
+			} catch(NullPointerException e){
+				//No input found
 			}
 		}
-		this.sendOutput(0, new Signal((digital) ? true : false, (analog) ? lowestValue : 0));
+		try{
+			this.sendOutput(0, new Signal((digital) ? true : false, (analog) ? lowestValue : 0));
+		} catch(NullPointerException e){
+			//No output to send
+		}
 	}
 	@Override
 	public boolean areInputsSettable() {
@@ -64,5 +77,9 @@ public class AND_Gate extends ILogicGateComponent{
 	@Override
 	public Rectangle getGateSize() {
 		return new Rectangle(new Dimension(2, inputs));
+	}
+	@Override
+	public Image getForegroundImage() {
+		return AND_Gate.foregroundImage;
 	}
 }

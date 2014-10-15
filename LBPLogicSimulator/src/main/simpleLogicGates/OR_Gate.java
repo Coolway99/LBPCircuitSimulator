@@ -1,12 +1,17 @@
 package main.simpleLogicGates;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Rectangle;
 
-import main.interfaces.ILogicGateComponent;
+import javax.swing.ImageIcon;
+
+import main.Main;
+import main.interfaces.ILogicGate;
 import main.interfaces.Signal;
 
-public class OR_Gate extends ILogicGateComponent{
+public class OR_Gate extends ILogicGate{
+	private static Image foregroundImage = new ImageIcon(Main.class.getResource("assets/gateOR.png")).getImage();
 	public OR_Gate(){
 		this.inputs = 2;
 		this.outputs = 1;
@@ -64,5 +69,9 @@ public class OR_Gate extends ILogicGateComponent{
 			}
 			this.sendOutput(0, new Signal((digital) ? true : false, (analog) ? highestValue : 0));
 		}
+	}
+	@Override
+	public Image getForegroundImage() {
+		return OR_Gate.foregroundImage;
 	}
 }
