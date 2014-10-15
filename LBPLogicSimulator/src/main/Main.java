@@ -10,12 +10,12 @@ public class Main {
 	public static void main(String[] Args){
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setVisible(true);
-		Timer timer = new Timer(true);
+		Timer timer = new Timer("Update Timer", true);
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				mainFrame.mainPanel1.doUpdate();
 			}
-		}, 1000/30);
+		}, 1000, 1000/30);
 	}
 }
