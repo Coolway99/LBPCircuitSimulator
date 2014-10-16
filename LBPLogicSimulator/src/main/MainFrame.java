@@ -26,6 +26,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         jSeparator1 = new javax.swing.JSeparator();
         mainPanel1 = new main.MainPanel();
+        jTextField1 = new javax.swing.JTextField();
+        mouseRealPos = new javax.swing.JTextField();
+        jTextField3 = new javax.swing.JTextField();
+        mouseGridPos = new javax.swing.JTextField();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuItemOpen = new javax.swing.JMenuItem();
@@ -45,7 +49,6 @@ public class MainFrame extends javax.swing.JFrame {
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setName("mainFrame"); // NOI18N
 
-        mainPanel1.setBackground(new java.awt.Color(255, 255, 255));
         mainPanel1.setPreferredSize(new java.awt.Dimension(593, 600));
 
         javax.swing.GroupLayout mainPanel1Layout = new javax.swing.GroupLayout(mainPanel1);
@@ -58,6 +61,25 @@ public class MainFrame extends javax.swing.JFrame {
             mainPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
+
+        jTextField1.setEditable(false);
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("Mouse real position:");
+        jTextField1.setOpaque(false);
+
+        mouseRealPos.setText("jTextField2");
+
+        jTextField3.setEditable(false);
+        jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField3.setText("Mouse grid position:");
+        jTextField3.setOpaque(false);
+
+        mouseGridPos.setText("jTextField4");
+        mouseGridPos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mouseGridPosActionPerformed(evt);
+            }
+        });
 
         menuFile.setText("File");
 
@@ -91,6 +113,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuBar.add(menuFile);
 
         menuEdit.setText("Edit");
+        menuBar.add(menuEdit);
 
         subMenuAddNew.setText("Add new...");
 
@@ -118,9 +141,7 @@ public class MainFrame extends javax.swing.JFrame {
         subMenuAdvancedLogic.setText("Advanced Logic");
         subMenuAddNew.add(subMenuAdvancedLogic);
 
-        menuEdit.add(subMenuAddNew);
-
-        menuBar.add(menuEdit);
+        menuBar.add(subMenuAddNew);
 
         setJMenuBar(menuBar);
 
@@ -132,12 +153,28 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(mainPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(193, 193, 193))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                    .addComponent(mouseRealPos)
+                    .addComponent(jTextField3)
+                    .addComponent(mouseGridPos))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
             .addComponent(mainPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mouseRealPos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mouseGridPos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -163,8 +200,12 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_saveFileAs
 
     private void menuOptionANDGateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOptionANDGateActionPerformed
-        
+		mainPanel1.addLogicGate(new AND_Gate());
     }//GEN-LAST:event_menuOptionANDGateActionPerformed
+
+    private void mouseGridPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseGridPosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mouseGridPosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,6 +244,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField3;
     public main.MainPanel mainPanel1;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuEdit;
@@ -214,6 +257,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuOptionNOTGate;
     private javax.swing.JMenuItem menuOptionORGate;
     private javax.swing.JMenuItem menuOptionXORGate;
+    public javax.swing.JTextField mouseGridPos;
+    public javax.swing.JTextField mouseRealPos;
     private javax.swing.JMenu subMenuAddNew;
     private javax.swing.JMenu subMenuAdvancedLogic;
     private javax.swing.JMenu subMenuSimpleLogic;

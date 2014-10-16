@@ -20,7 +20,7 @@ public class MainPanel extends JPanel{
 			new HashMap<Integer, ILogicGate>();
 	private int count = 0;
 	private final LogicMouseListener LML = new LogicMouseListener();
-	protected byte scale = 10;
+	protected byte scale = 100;
 	public MainPanel(){
 		super();
 		this.addMouseListener(LML);
@@ -41,20 +41,22 @@ public class MainPanel extends JPanel{
 		}
 	}
 	public ILogicGate getLogicGateAt(Point p){
-		System.out.println("Getting logic gate at real point"+p);
+		System.out.println("Getting logic gate at "+p);
 		Integer[] keys = gates.keySet().toArray(new Integer[0]);
 		ILogicGate gate = null;
 		for(int x = 0; x < keys.length; x++){
+			System.out.println("Testing gate "+x);
 			gate = gates.get(keys[x]);
 			Rectangle size = gate.getGateSize();
+			size.setBounds(0, 0, size.width*scale, size.height*scale);
 			size.setLocation(gate.getDraggableLocation());
+			System.out.println("Size is " + size);
 			if(size.contains(p)){
 				break;
 			} else {
 				gate = null;
 			}
 		}
-		gate = gates.get(keys[0]);
 		System.out.println((gate != null)? "Logic gate with ID "+gate.getID()+" returned" :
 			"No logic gate found at "+p);
 		return gate;
@@ -63,16 +65,16 @@ public class MainPanel extends JPanel{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-		g2.scale(scale, scale);
 		Integer[] keys = gates.keySet().toArray(new Integer[0]);
 		for(int x = 0; x < keys.length; x++){
 			ILogicGate gate = gates.get(keys[x]);
-			/*g2.drawImage(gate.getBackgroundImage(), gate.getDraggableLocation().x,
-					gate.getDraggableLocation().y, gate.getGateSize().width, gate.getGateSize().height,null);*/
+			g2.drawImage(gate.getBackgroundImage(), gate.getDraggableLocation().x,
+					gate.getDraggableLocation().y, gate.getGateSize().width*scale,
+					gate.getGateSize().height*scale, null);
 			g2.drawImage(gate.getForegroundImage(), 
-					(int) (gate.getDraggableLocation().x/scale),
-					(int) (gate.getDraggableLocation().y/scale),
-					15, 15, Color.BLACK, null);
+					(int) (gate.getDraggableLocation().x +  .15 * scale),
+					(int) (gate.getDraggableLocation().y +  .15 * scale),
+					(int) (1.7 * scale), (int) (1.7 * scale), Color.BLACK, null);
 		}
 	}
 	public synchronized void doUpdate(){
@@ -86,6 +88,8 @@ public class MainPanel extends JPanel{
 class LogicMouseListener extends MouseAdapter{
 	private double oldX = 0;
 	private double oldY = 0;
+	private double offsetX = 0;
+	private double offsetY = 0;
 	private ILogicGate gate = null;
 	@Override
 	public void mouseMoved(MouseEvent e) {
@@ -100,13 +104,19 @@ class LogicMouseListener extends MouseAdapter{
 		this.oldY = e.getY();
 		MainPanel panel = (MainPanel) e.getSource();
 		gate = panel.getLogicGateAt(e.getPoint());
-		
+		if(gate != null){
+			this.offsetX = e.getX() - gate.getDraggableLocation().getX();
+			this.offsetY = e.getY() - gate.getDraggableLocation().getY();
+			System.out.println("Offset X = "+this.offsetX+", Offset Y = "+this.offsetY);
+		}
 	};
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		System.out.println("Mouse Released Event");
 		this.oldX = 0;
 		this.oldY = 0;
+		this.offsetX = 0;
+		this.offsetY = 0;
 		this.gate = null;
 	};
 	@Override
@@ -115,8 +125,7 @@ class LogicMouseListener extends MouseAdapter{
 		if(e.getSource() instanceof MainPanel){
 			if((gate != null && gate instanceof ILogicDraggable) &&
 					(Math.abs(oldX - e.getX()) > 1) && (Math.abs(oldY - e.getY()) > 1)){
-				Point p = new Point();
-				gate.setDraggableLocation(e.getPoint());
+				gate.setDraggableLocation(new Point((int) (e.getX() - this.offsetX), (int) (e.getY() - this.offsetY)));
 				this.oldX = e.getX();
 				this.oldY = e.getY();
 			}
