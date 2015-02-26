@@ -13,8 +13,9 @@ public class Main {
 		Timer timer = new Timer("Update Timer", true);
 		timer.schedule(new TimerTask() {
 			@Override
-			public void run() {
-				mainFrame.mainPanel1.doUpdate();
+			public void run(){
+				mainFrame.mainPanel.update();
+				mainFrame.mainPanel.repaint();
 			}
 		}, 1000, 1000/30);
 	}

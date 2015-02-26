@@ -7,10 +7,10 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 import main.Main;
-import main.interfaces.ILogicGate;
+import main.interfaces.LegacyILogicGate;
 import main.interfaces.Signal;
 
-public class XOR_Gate extends ILogicGate{
+public class XOR_Gate extends LegacyILogicGate{
 	private static Image foregroundImage = new ImageIcon(Main.class.getResource("assets/gateXOR.png")).getImage();
 	public XOR_Gate() {
 		this.inputs = 2;
