@@ -1,14 +1,14 @@
 package main.simpleLogicGates
 
 import java.awt.Toolkit
-import main.Main
 import main.interfaces.LogicGate
 import main.interfaces.Signal
 import java.awt.Rectangle
+import main.LBPLogicSimulator
 
 class AND_Gate extends LogicGate{
 	
-	static val image = Toolkit.getDefaultToolkit.createImage(typeof(Main).classLoader.getResource("assets/gateAND.png"))
+	static val image = Toolkit.getDefaultToolkit.createImage(typeof(LBPLogicSimulator).classLoader.getResource("assets/gateAND.png"))
 	
 	new(){
 		this.inputs = 2;

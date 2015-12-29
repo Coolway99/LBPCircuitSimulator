@@ -5,8 +5,8 @@ import java.awt.Rectangle
 import java.awt.Toolkit
 import java.util.ArrayList
 import java.util.List
-import main.Main
 import org.eclipse.xtend.lib.annotations.Accessors
+import main.LBPLogicSimulator
 
 /**
  * The base class for all logic. All logic gates MUST be extend this class<br />
@@ -30,7 +30,7 @@ abstract class LogicGate implements ILogicInput, ILogicOutput{
 	ArrayList<List<ILogicInput>> outputListeners = newArrayList()
 	@Accessors
 	Rectangle area = new Rectangle
-	static val backgroundImage = Toolkit.getDefaultToolkit.createImage(typeof(Main).classLoader.getResource("assets/logicBackground.png"))
+	static val backgroundImage = Toolkit.getDefaultToolkit.createImage(typeof(LBPLogicSimulator).classLoader.getResource("assets/logicBackground.png"))
 	
 	def protected void setOutput(int port, Signal signal){
 		try{

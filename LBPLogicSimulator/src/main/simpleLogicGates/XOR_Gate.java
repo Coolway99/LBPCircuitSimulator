@@ -6,12 +6,12 @@ import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 
-import main.Main;
+import main.LBPLogicSimulator;
 import main.interfaces.LegacyILogicGate;
 import main.interfaces.Signal;
 
 public class XOR_Gate extends LegacyILogicGate{
-	private static Image foregroundImage = new ImageIcon(Main.class.getResource("assets/gateXOR.png")).getImage();
+	private static Image foregroundImage = new ImageIcon(LBPLogicSimulator.class.getResource("assets/gateXOR.png")).getImage();
 	public XOR_Gate() {
 		this.inputs = 2;
 		this.outputs = 1;

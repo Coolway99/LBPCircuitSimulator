@@ -14,8 +14,8 @@ import main.interfaces.LogicGate
 
 class MainPanel extends JPanel implements MouseListener, MouseMotionListener{
 	
-	static val in = Toolkit.getDefaultToolkit.createImage(typeof(Main).classLoader.getResource("assets/in.png"))
-	static val out = Toolkit.getDefaultToolkit.createImage(typeof(Main).classLoader.getResource("assets/out.png"))
+	static val in = Toolkit.getDefaultToolkit.createImage(typeof(LBPLogicSimulator).classLoader.getResource("assets/in.png"))
+	static val out = Toolkit.getDefaultToolkit.createImage(typeof(LBPLogicSimulator).classLoader.getResource("assets/out.png"))
 	
 	ArrayList<LogicGate> gates =  newArrayList()
 	var offsetX = 0

@@ -47,7 +47,7 @@ public class MainFrame extends javax.swing.JFrame {
 		menuItemOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int value = fc.showOpenDialog(Main.mainFrame);
+				int value = fc.showOpenDialog(LBPLogicSimulator.mainFrame);
 				if(value == JFileChooser.APPROVE_OPTION){
 					//TODO Open Dialog
 				}
@@ -74,7 +74,7 @@ public class MainFrame extends javax.swing.JFrame {
 		menuItemSaveAs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int value = fc.showSaveDialog(Main.mainFrame);
+				int value = fc.showSaveDialog(LBPLogicSimulator.mainFrame);
 				if(value == JFileChooser.APPROVE_OPTION){
 					//TODO Saving
 				}
