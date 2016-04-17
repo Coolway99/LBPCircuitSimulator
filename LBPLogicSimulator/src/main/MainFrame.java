@@ -32,10 +32,6 @@ public class MainFrame extends javax.swing.JFrame {
 	private JMenu subMenuAdvancedLogic = new JMenu("Advanced Logic");
 	public JFileChooser fc = new JFileChooser();
 	
-	public static void main(String args[]) {
-		new MainFrame().setVisible(true);
-	}
-
 	public MainFrame(){
 		super();
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -43,71 +39,71 @@ public class MainFrame extends javax.swing.JFrame {
 		setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 		setName("mainFrame"); // NOI18N
 		
-		menuItemOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-		menuItemOpen.addActionListener(new ActionListener() {
+		this.menuItemOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		this.menuItemOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int value = fc.showOpenDialog(LBPLogicSimulator.mainFrame);
+				int value = MainFrame.this.fc.showOpenDialog(LBPLogicSimulator.mainFrame);
 				if(value == JFileChooser.APPROVE_OPTION){
 					//TODO Open Dialog
 				}
 			}
 		});
-		menuFile.add(menuItemOpen);
+		this.menuFile.add(this.menuItemOpen);
 		
-		menuItemSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-		menuItemSave.setText("Save...");
-		menuItemSave.addActionListener(new ActionListener() {
+		this.menuItemSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		this.menuItemSave.setText("Save...");
+		this.menuItemSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(fc.getSelectedFile() == null){
-					menuItemSaveAs.doClick();
+				if(MainFrame.this.fc.getSelectedFile() == null){
+					MainFrame.this.menuItemSaveAs.doClick();
 				} else {
 					//TODO Saving
 				}
 			}
 		});
-		menuFile.add(menuItemSave);
+		this.menuFile.add(this.menuItemSave);
 		
-		menuItemSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
-		menuItemSaveAs.setText("Save As...");
-		menuItemSaveAs.addActionListener(new ActionListener() {
+		this.menuItemSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
+		this.menuItemSaveAs.setText("Save As...");
+		this.menuItemSaveAs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int value = fc.showSaveDialog(LBPLogicSimulator.mainFrame);
+				int value = MainFrame.this.fc.showSaveDialog(LBPLogicSimulator.mainFrame);
 				if(value == JFileChooser.APPROVE_OPTION){
 					//TODO Saving
 				}
 			}
 		});
-		menuFile.add(menuItemSaveAs);
+		this.menuFile.add(this.menuItemSaveAs);
 		
-		menuBar.add(menuFile);
+		this.menuBar.add(this.menuFile);
 		
-		menuBar.add(menuEdit);
+		this.menuBar.add(this.menuEdit);
 		
-		menuOptionANDGate.addActionListener(new ActionListener() {
+		this.menuOptionANDGate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mainPanel.addLogicGate(new AND_Gate());
+				MainFrame.this.mainPanel.addLogicGate(new AND_Gate());
 			}
 		});
-		subMenuSimpleLogic.add(menuOptionANDGate);
+		this.subMenuSimpleLogic.add(this.menuOptionANDGate);
 		
-		subMenuSimpleLogic.add(menuOptionORGate);
+		this.subMenuSimpleLogic.add(this.menuOptionORGate);
 		
-		subMenuSimpleLogic.add(menuOptionNOTGate);
+		this.subMenuSimpleLogic.add(this.menuOptionNOTGate);
 		
-		subMenuSimpleLogic.add(menuOptionXORGate);
+		this.subMenuSimpleLogic.add(this.menuOptionXORGate);
 		
-		subMenuAddNew.add(subMenuSimpleLogic);
+		this.subMenuAddNew.add(this.subMenuSimpleLogic);
 		
-		subMenuAddNew.add(subMenuAdvancedLogic);
+		this.subMenuAddNew.add(this.subMenuAdvancedLogic);
 		
-		menuBar.add(subMenuAddNew);
+		this.menuBar.add(this.subMenuAddNew);
 		
-		setJMenuBar(menuBar);
-		add(mainPanel);
+		setJMenuBar(this.menuBar);
+		add(this.mainPanel);
 		pack();
 	}
 }
