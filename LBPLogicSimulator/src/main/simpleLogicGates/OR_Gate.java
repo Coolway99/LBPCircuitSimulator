@@ -1,77 +1,48 @@
 package main.simpleLogicGates;
 
-import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Rectangle;
 
-import javax.swing.ImageIcon;
+import main.ResourceHelper;
+import main.interfaces.LogicGate;
 
-import main.LBPLogicSimulator;
-import main.interfaces.LegacyILogicGate;
-import main.interfaces.Signal;
-
-public class OR_Gate extends LegacyILogicGate{
-	private static Image foregroundImage = new ImageIcon(LBPLogicSimulator.class.getResource("assets/gateOR.png")).getImage();
+/**
+ * The OR gate is one of the basic logic gates<br>
+ * Digital: Turns on when either input is true<br>
+ * Analog: Outputs the higher of the 2 values, ignoring sign.
+ * @author Coolway99
+ */
+public class OR_Gate extends LogicGate{
+	
+	private boolean output = false;
+	
 	public OR_Gate(){
-		this.inputs = 2;
-		this.outputs = 1;
+		super(2);
 	}
+
 	@Override
-	public boolean areInputsSettable() {
-		return true;
-	}
-	@Override
-	public int getInputMaxValue() {
-		return 100;
-	}
-	@Override
-	public int getInputMinValue() {
-		return 2;
-	}
-	@Override
-	public boolean areOutputsSettable() {
-		return false;
-	}
-	@Override
-	public int getOutputMaxValue() {
-		return 0;
-	}
-	@Override
-	public int getOutputMinValue() {
-		return 0;
-	}
-	@Override
-	public boolean hasBottomInputs() {
-		return false;
-	}
-	@Override
-	public int getBottomInputs() {
-		return 0;
-	}
-	@Override
-	public Rectangle getGateSize() {
-		return new Rectangle(new Dimension(2, inputs));
-	}
-	@Override
-	public void update() {
-		boolean analog = false;
-		boolean digital = false;
-		double highestValue = 0;
-		for(int x = 0; x < this.inputs; x++){
-			Signal s = this.inputSignals.get(x);
-			if(s.getAnalog() == 0){
-				analog = true;
-			} else if(Math.abs(s.getAnalog()) > highestValue){
-				highestValue = s.getAnalog();
+	public boolean update(long cycle){
+		if(cycle == this.lastUpdated) return true;
+		this.lastUpdated = cycle;
+		boolean newOut = false;
+		for(LogicGate gate : this.inList){
+			if(gate != null && gate.getOutput(cycle)){
+				newOut = true;
+				break;
 			}
-			if(!s.getDigital()){
-				digital = true;
-			}
-			this.sendOutput(0, new Signal((digital) ? true : false, (analog) ? highestValue : 0));
 		}
+		this.output = newOut;
+		return false;
 	}
+
 	@Override
-	public Image getForegroundImage() {
-		return OR_Gate.foregroundImage;
+	public boolean getOutput(long cycle){
+		this.update(cycle);
+		return this.output;
 	}
+	
+	@Override
+	public Image getForegroundImage(){
+		return ResourceHelper.getImage("gateOR.png");
+	}
+	
 }

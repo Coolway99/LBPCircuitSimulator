@@ -1,10 +1,21 @@
 package main.simpleLogicGates;
 
-import main.interfaces.LogicGate2;
+import java.awt.Image;
 
-public class AND_Gate2 extends LogicGate2{
+import main.ResourceHelper;
+import main.interfaces.LogicGate;
+
+/**
+ * The AND gate is one of the basic logic gates<br>
+ * Digital: Only turns one when both inputs are true<br>
+ * Analog: Outputs the lower of the 2 values. The signs of the 2 values are multiplied together.
+ * If there's 2 negative or 2 positive inputs, the output is positive, otherwise negative.
+ * @author Coolway99
+ */
+public class AND_Gate2 extends LogicGate{
 	
-	private byte output = 0;
+	private boolean output = false;
+	//private double analog = 0;
 	
 	public AND_Gate2(){
 		super(2);
@@ -14,14 +25,16 @@ public class AND_Gate2 extends LogicGate2{
 	public boolean update(long cycle){
 		if(cycle == this.lastUpdated) return true;
 		this.lastUpdated = cycle;
-		byte newOut = 1;
-		for(LogicGate2 gate : this.inList){
+		boolean newOut = true;
+		//this.analog = 100;
+		for(LogicGate gate : this.inList){
 			if(gate == null){
-				newOut = 0;
+				newOut = false;
+				//this.analog = 0;
 				break;
 			}
-			if(gate.getOutput(cycle) != 1){
-				newOut = 0;
+			if(!gate.getOutput(cycle)){
+				newOut = false;
 				break;
 			}
 		}
@@ -30,9 +43,14 @@ public class AND_Gate2 extends LogicGate2{
 	}
 	
 	@Override
-	public byte getOutput(long cycle){
+	public boolean getOutput(long cycle){
 		this.update(cycle);
 		return this.output;
+	}
+
+	@Override
+	public Image getForegroundImage(){
+		return ResourceHelper.getImage("gateAND.png");
 	}
 	
 }

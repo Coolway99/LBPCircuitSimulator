@@ -1,7 +1,9 @@
 package main;
 
+import java.awt.Point;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Timer;
@@ -10,25 +12,36 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import main.interfaces.LogicGate2;
+import main.interfaces.LogicGate;
 import main.simpleLogicGates.AND_Gate2;
 import main.simpleLogicGates.NOT_Gate;
-import main.simpleLogicGates.OR_Gate2;
-import main.simpleLogicGates.XOR_Gate2;
+import main.simpleLogicGates.OR_Gate;
+import main.simpleLogicGates.XOR_Gate;
 
 public class LBPLogicSimulator {
 	public static final MainFrame mainFrame = new MainFrame();
-	public static final ArrayList<LogicGate2> gates = new ArrayList<>();
+	public static final ArrayList<LogicGate> gates = new ArrayList<>();
 	public static long cycle = 0;
 	public static void main(String[] Args){
-		halfGUI();
+		//halfGUI();
+		final JFrame frame = new JFrame("Test");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(800, 600);
+		MainPanel2 mainPanel = new MainPanel2();
+		frame.add(mainPanel);
+		frame.setVisible(true);
+		Timer timer = new Timer("Update Timer", true);
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run(){
+				frame.repaint();;
+			}
+		}, 1000, 1000/30);
 	}
 	
 	@SuppressWarnings("unused")
 	private static void GUI(){
-		mainFrame.setSize(800, 600);
-		mainFrame.setLocationRelativeTo(null);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.init();
 		mainFrame.setVisible(true);
 		Timer timer = new Timer("Update Timer", true);
 		timer.schedule(new TimerTask(){
@@ -37,7 +50,7 @@ public class LBPLogicSimulator {
 				cycle++;
 				mainFrame.mainPanel.update();
 				mainFrame.mainPanel.repaint();
-				for(LogicGate2 gate : gates){
+				for(LogicGate gate : gates){
 						gate.update(cycle);
 				}
 			}
@@ -51,6 +64,7 @@ public class LBPLogicSimulator {
 		frame.setSize(800, 600);
 		frame.setLocationRelativeTo(null);
 		frame.add(new JScrollPane(stream.getTextArea()));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		System.setOut(new PrintStream(stream));
 		System.setIn(stream.input);
@@ -79,7 +93,7 @@ public class LBPLogicSimulator {
 						break;
 					}
 					for(int x = 0; x < gates.size(); x++){
-						LogicGate2 gate = gates.get(x);
+						LogicGate gate = gates.get(x);
 						if(gate == null){
 							System.out.println("Gate "+x+" is NULL");
 							continue;
@@ -87,7 +101,7 @@ public class LBPLogicSimulator {
 						System.out.println("Gate "+x+" has an output of "+gate.getOutput(cycle));
 						System.out.println("Is currently on cycle "+gate.lastUpdated);
 						for(byte y = 0; y < gate.numOfIn; y++){
-							LogicGate2 gateIN = gate.getInputGate(y);
+							LogicGate gateIN = gate.getInputGate(y);
 							if(gateIN == null){
 								System.out.println("No input on port "+y);
 								continue;
@@ -97,7 +111,7 @@ public class LBPLogicSimulator {
 						if(gate.outList.isEmpty()){
 							System.out.println("Contains no outputs");
 						} else {
-							for(LogicGate2 gateOUT : gate.outList.keySet()){
+							for(LogicGate gateOUT : gate.outList.keySet()){
 								System.out.print("Currently is outputing to gate "
 										+gates.indexOf(gateOUT)+" on input(s) ");
 								for(Byte port : gate.outList.get(gateOUT)){
@@ -111,7 +125,7 @@ public class LBPLogicSimulator {
 				}
 				case("UPDATE"):{
 					cycle++;
-					for(LogicGate2 gate : gates){
+					for(LogicGate gate : gates){
 						System.out.print("Updating gate "+gates.indexOf(gate));
 						if(gate.update(cycle)){
 							System.out.println(" but it was already updated");
@@ -122,7 +136,7 @@ public class LBPLogicSimulator {
 					break;
 				}
 				case("CREATE"):{
-					LogicGate2 gate;
+					LogicGate gate;
 					while(true){
 						System.out.print("Which Gate:>");
 						switch(scanner.nextLine().toUpperCase()){
@@ -133,10 +147,10 @@ public class LBPLogicSimulator {
 								gate = new NOT_Gate();
 								break;
 							case("OR"):
-								gate = new OR_Gate2();
+								gate = new OR_Gate();
 								break;
 							case("XOR"):
-								gate = new XOR_Gate2();
+								gate = new XOR_Gate();
 								break;
 							default:
 								System.out.println("Unrecognized gate");
@@ -156,7 +170,7 @@ public class LBPLogicSimulator {
 						System.out.print("Which gate:>");
 						int num = scanner.nextInt();
 						System.out.println("Deleting gate "+num);
-						LogicGate2 gate = gates.get(num);
+						LogicGate gate = gates.get(num);
 						if(gate == null){
 							System.out.println("But it didn't exist!");
 							break;
@@ -175,10 +189,10 @@ public class LBPLogicSimulator {
 					try{
 						System.out.print("The output of which gate:>");
 						int num = scanner.nextInt();
-						LogicGate2 gateFrom = gates.get(num);
+						LogicGate gateFrom = gates.get(num);
 						System.out.print("To which gate:>");
 						num = scanner.nextInt();
-						LogicGate2 gateTo = gates.get(num);
+						LogicGate gateTo = gates.get(num);
 						System.out.print("Which port:>");
 						byte port = scanner.nextByte();
 						gateFrom.connectOutput(port, gateTo);
@@ -198,8 +212,8 @@ public class LBPLogicSimulator {
 						int num = scanner.nextInt();
 						System.out.print("Which port:>");
 						byte port = scanner.nextByte();
-						LogicGate2 gate = gates.get(num);
-						LogicGate2 gateOUT = gate.getInputGate(port);
+						LogicGate gate = gates.get(num);
+						LogicGate gateOUT = gate.getInputGate(port);
 						gate.breakInput(port);
 						gateOUT.breakOutput(gate);
 						System.out.println("Done");
