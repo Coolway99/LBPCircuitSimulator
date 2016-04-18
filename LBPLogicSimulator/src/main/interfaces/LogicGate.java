@@ -37,6 +37,12 @@ public abstract class LogicGate{
 	public long lastUpdated = 0;
 	
 	/**
+	 * The set defining what on/off colors the chip has. This is the color drawn
+	 * under the chip
+	 */
+	private ColorSet color = ColorSet.DEFAULT;
+	
+	/**
 	 * A constructor that converts inputs to <b>byte</b> and then calls {@link #LogicGate2(byte)}
 	 * @param inputs How many inputs the gate has
 	 */
@@ -173,6 +179,14 @@ public abstract class LogicGate{
 	 * @return The image that should be used for this gate.
 	 */
 	public abstract Image getImage();
+	
+	public ColorSet getColors(){
+		return this.color;
+	}
+	
+	public void setColors(ColorSet colors){
+		this.color = colors;
+	}
 	
 	/**
 	 * If this logic gate is being deleted, then run {@link #delete()}

@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import main.interfaces.ColorSet;
 import main.interfaces.LogicGate;
 import main.simpleLogicGates.AND_Gate2;
 import main.simpleLogicGates.NOT_Gate;
@@ -31,6 +32,12 @@ import main.simpleLogicGates.XOR_Gate;
  */
 public class MainPanel2 extends JPanel implements MouseListener, MouseMotionListener, ActionListener{
 	private static final long serialVersionUID = -2490678084136159574L;
+	
+	/**
+	 * Stores the update cycle. There's no need to worry about overflowing, since all we detect
+	 * is a change in the value.
+	 */
+	public byte cycle = 0;
 	
 	/**
 	 * This is the map that stores the locations of all the logic gates.
@@ -93,20 +100,41 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 		this.addPanelItem("New NOT Gate", "newNOTGate");
 	}
 	
+	public void update(){
+		synchronized(this){
+			this.cycle++;
+			for(LogicGate gate : this.gates.values()){
+				gate.update(this.cycle);
+			}
+			if(this.currentGate != null){
+				this.currentGate.update(this.cycle);
+			}
+		}
+	}
+	
 	@Override
 	protected void paintComponent(Graphics g){
-		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
-		for(Point point : this.gates.keySet()){
-			LogicGate gate = this.gates.get(point);
-			g2.drawImage(gate.getImage(), point.x*this.scale,
-					point.y*this.scale, gate.area.width*this.scale,
-					gate.area.height*this.scale, null);
-		}
-		if(this.currentPoint != null && this.currentGate != null){
-			g2.drawImage(this.currentGate.getImage(), this.currentPoint.x*this.scale,
-					this.currentPoint.y*this.scale, this.currentGate.area.width*this.scale,
-					this.currentGate.area.height*this.scale, null);
+		synchronized(this){
+			super.paintComponent(g);
+			Graphics2D g2 = (Graphics2D) g;
+			for(Point point : this.gates.keySet()){
+				LogicGate gate = this.gates.get(point);
+				ColorSet colors = gate.getColors();
+				g2.drawImage(gate.getImage(), point.x*this.scale,
+						point.y*this.scale, gate.area.width*this.scale,
+						gate.area.height*this.scale,
+						(gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()),
+						null);
+			}
+			if(this.currentPoint != null && this.currentGate != null){
+				g2.drawImage(this.currentGate.getImage(), this.currentPoint.x*this.scale,
+						this.currentPoint.y*this.scale, this.currentGate.area.width*this.scale,
+						this.currentGate.area.height*this.scale,
+						(this.currentGate.getOutput(this.cycle) ?
+								this.currentGate.getColors().getOn() :
+									this.currentGate.getColors().getOff())
+						,null);
+			}
 		}
 	}
 	
@@ -134,7 +162,8 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					byte port = -1;
 					do{
 						try{
-							port = Byte.parseByte(JOptionPane.showInputDialog("Which port?", 0));
+							port = Byte.parseByte(JOptionPane.showInputDialog(
+									LBPLogicSimulator.mainFrame, "Which port?", 0));
 						} catch(NumberFormatException e2){
 							port = -1;
 						}
@@ -239,7 +268,10 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 						}
 					}while(port < 0);
 					try{
-						this.currentGate.getInputGate(port).breakOutput(this.currentGate);
+						LogicGate gate = this.currentGate.getInputGate(port);
+						if(gate != null){
+							gate.breakOutput(this.currentGate);
+						}
 						this.currentGate.breakInput(port);
 
 						System.out.println("Disconnected");
@@ -256,11 +288,16 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					this.currentPoint = null;
 					break;
 				}
+				case("connect"):{
+					this.special = Special.CONNECT;
+					break;
+				}
 				default:
-					this.special = Special.valueOf(name);
+					this.special = Special.NONE;
 			}
 		}catch(IllegalArgumentException|NullPointerException e2){
 			//It's not a valid argument
+			System.out.println("Not a valid name, "+name);
 			this.special = Special.NONE;
 		}
 	}
@@ -311,22 +348,9 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
  * @author Coolway99
  */
 enum Special{
-	NONE ("none"), //There is nothing special to do
-	CONNECT ("connect"), //We are connecting 2 gates to eachother
-	DISCONNECT ("disconnect"), //We are disconnecting 2 gates from eachother
-	PLACE ("create"), //We are placing down a brand new gate
+	NONE, //There is nothing special to do
+	CONNECT, //We are connecting 2 gates to eachother
+	DISCONNECT, //We are disconnecting 2 gates from eachother
+	PLACE, //We are placing down a brand new gate
 	;
-	private final String name;
-	
-	private Special(){
-		this.name = "none";
-	}
-	
-	private Special(String name){
-		this.name = name;
-	}
-	
-	public String getName(){
-		return this.name;
-	}
 }

@@ -17,27 +17,35 @@ import main.simpleLogicGates.OR_Gate;
 import main.simpleLogicGates.XOR_Gate;
 
 public class LBPLogicSimulator {
-	public static final MainFrame mainFrame = new MainFrame();
+	//public static final MainFrame mainFrame = new MainFrame();
+	public static final JFrame mainFrame = new JFrame("Logic Test");
 	public static final ArrayList<LogicGate> gates = new ArrayList<>();
 	public static byte cycle = 0;
+	public static final Timer fpsTimer = new Timer("FPS Timer", true);
+	public static final Timer updateTimer = new Timer("Update Timer", true);
 	public static void main(String[] Args){
 		//halfGUI();
-		final JFrame frame = new JFrame("Test");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 600);
-		MainPanel2 mainPanel = new MainPanel2();
-		frame.add(mainPanel);
-		frame.setVisible(true);
-		Timer timer = new Timer("Update Timer", true);
-		timer.schedule(new TimerTask(){
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setSize(800, 600);
+		final MainPanel2 mainPanel = new MainPanel2();
+		mainFrame.add(mainPanel);
+		mainFrame.setVisible(true);
+		fpsTimer.schedule(new TimerTask(){
 			@Override
 			public void run(){
-				frame.repaint();;
+				//mainPanel.update();
+				mainFrame.repaint();
+			}
+		}, 1000, 1000/30);
+		updateTimer.schedule(new TimerTask(){
+			@Override
+			public void run(){
+				mainPanel.update();
 			}
 		}, 1000, 1000/30);
 	}
 	
-	@SuppressWarnings("unused")
+	/*@SuppressWarnings("unused")
 	private static void GUI(){
 		mainFrame.init();
 		mainFrame.setVisible(true);
@@ -53,7 +61,7 @@ public class LBPLogicSimulator {
 				}
 			}
 		}, 1000, 1000/30);
-	}
+	}*/
 	
 	//FOR TESTING
 	private static void halfGUI(){
