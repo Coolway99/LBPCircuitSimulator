@@ -20,7 +20,7 @@ public class XOR_Gate extends LogicGate{
 	}
 
 	@Override
-	public boolean update(long cycle){
+	public boolean update(byte cycle){
 		if(cycle == this.lastUpdated) return true;
 		this.lastUpdated = cycle;
 		boolean newOut = false;
@@ -34,13 +34,13 @@ public class XOR_Gate extends LogicGate{
 	}
 	
 	@Override
-	public boolean getOutput(long cycle){
+	public boolean getOutput(byte cycle){
 		this.update(cycle);
 		return this.output;
 	}
 	
 	@Override
-	public Image getForegroundImage(){
+	public Image getImage(){
 		return ResourceHelper.getImage("gateXOR.png");
 	}
 	

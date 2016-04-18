@@ -1,27 +1,16 @@
 package main;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import javax.swing.JFrame;
 
-import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
-import main.simpleLogicGates.AND_Gate;
-
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 443248416294991918L;
 	
 	public MainPanel mainPanel = new MainPanel();
-	private JMenuBar menuBar = new JMenuBar();
+	/*private JMenuBar menuBar = new JMenuBar();
 	private JMenu menuFile = new JMenu("File");
 	private JMenuItem menuItemOpen = new JMenuItem("Open...");
 	private JMenuItem menuItemSave = new JMenuItem("Save");
-	private JMenuItem menuItemSaveAs = new JMenuItem("Save as...");
+	protected JMenuItem menuItemSaveAs = new JMenuItem("Save as...");
 	private JMenu menuEdit = new JMenu("Edit");
 	private JMenu subMenuAddNew = new JMenu("Add New");
 	private JMenu subMenuSimpleLogic = new JMenu("Simple Logic");
@@ -30,16 +19,21 @@ public class MainFrame extends javax.swing.JFrame {
 	private JMenuItem menuOptionNOTGate = new JMenuItem("NOT Gate");
 	private JMenuItem menuOptionXORGate = new JMenuItem("XOR Gate");
 	private JMenu subMenuAdvancedLogic = new JMenu("Advanced Logic");
-	public JFileChooser fc = new JFileChooser();
+	public JFileChooser fc = new JFileChooser();*/
 	
 	public MainFrame(){
-		super();
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setTitle("TestFrame");
-		setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-		setName("mainFrame"); // NOI18N
+		super("LBP Logic Simulator");
+	}
+	
+	public void init(){
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setJMenuBar(this.menuBar);
+		this.add(this.mainPanel);
+		this.setSize(800, 600);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		this.menuItemOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		/*this.menuItemOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		this.menuItemOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -100,10 +94,6 @@ public class MainFrame extends javax.swing.JFrame {
 		
 		this.subMenuAddNew.add(this.subMenuAdvancedLogic);
 		
-		this.menuBar.add(this.subMenuAddNew);
-		
-		setJMenuBar(this.menuBar);
-		add(this.mainPanel);
-		pack();
+		this.menuBar.add(this.subMenuAddNew);*/
 	}
 }

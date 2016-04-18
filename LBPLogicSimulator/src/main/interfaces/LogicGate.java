@@ -5,8 +5,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import main.ResourceHelper;
-
 /**
  * The base class for all logic gates 
  * @author Coolway99
@@ -118,8 +116,9 @@ public abstract class LogicGate{
 	/**
 	 * Automatically unsubscribes itself from all gates on it's input, and
 	 * removes itself from outputting to other gates.
-	 * 
+	 * <br><br>
 	 * Call before deleting this object, as it doesn't clear it's own lists.
+	 * You cannot expect garbage collection to automatically call {@link #finalize()}
 	 */
 	public void delete(){
 		for(LogicGate gate : this.inList){
@@ -156,21 +155,37 @@ public abstract class LogicGate{
 	/**
 	 * Updates the gate. If the cycle matches the previous one, do not update.
 	 * If it needs to update it's inputs, it will do so.
+	 * It can be a byte because all it detects is change, so if the byte overflows then it's still a change
 	 * @param cycle The "cycle" of the program, to prevent it updating more than once per tick
 	 * @return Was it already updated?
 	 */
-	public abstract boolean update(long cycle);
+	public abstract boolean update(byte cycle);
 
 	/**
-	 * Returns the output of this gate, updating it if it need be
+	 * Returns the output of this gate, updating it if it need be<br>
 	 * @param cycle The cycle, if not the previous one, update the gate first
 	 * @return The output of the gate.
 	 */
-	public abstract boolean getOutput(long cycle);
+	public abstract boolean getOutput(byte cycle);
 	
-	public abstract Image getForegroundImage();
+	/**
+	 * Fetches the image used to render this logic gate.
+	 * @return The image that should be used for this gate.
+	 */
+	public abstract Image getImage();
 	
-	public Image getBackgroundImage(){
-		return ResourceHelper.getImage("logicBackground2.png");
+	/**
+	 * If this logic gate is being deleted, then run {@link #delete()}
+	 * <br><br>
+	 * Technically speaking, if this logic gate "still exists" then it's unable
+	 * for it to be garbage collected. This is due to it still being reference-able
+	 * inside other logic gates due to how it's stored.
+	 * <br><br>
+	 * TODO This really should need to do this. Provided how everything works,
+	 * this logic gate shouldn't be in the memory of others if it's being deleted.
+	 */
+	@Override
+	protected void finalize() throws Throwable{
+		this.delete();
 	}
 }

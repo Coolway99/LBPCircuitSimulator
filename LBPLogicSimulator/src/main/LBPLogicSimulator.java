@@ -1,9 +1,7 @@
 package main;
 
-import java.awt.Point;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Timer;
@@ -21,7 +19,7 @@ import main.simpleLogicGates.XOR_Gate;
 public class LBPLogicSimulator {
 	public static final MainFrame mainFrame = new MainFrame();
 	public static final ArrayList<LogicGate> gates = new ArrayList<>();
-	public static long cycle = 0;
+	public static byte cycle = 0;
 	public static void main(String[] Args){
 		//halfGUI();
 		final JFrame frame = new JFrame("Test");
