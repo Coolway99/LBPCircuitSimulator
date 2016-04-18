@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -117,14 +118,45 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 		synchronized(this){
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
+			//For drawing lines, set stroke width to 1/8th scale
+			g2.setStroke(new BasicStroke(this.scale / 8));
 			for(Point point : this.gates.keySet()){
 				LogicGate gate = this.gates.get(point);
 				ColorSet colors = gate.getColors();
+				//Get the image and scale it
 				g2.drawImage(gate.getImage(), point.x*this.scale,
 						point.y*this.scale, gate.area.width*this.scale,
 						gate.area.height*this.scale,
-						(gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()),
-						null);
+						//Changes color based on it's digital state
+						(gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff())
+						//We don't have an image observer
+						, null);
+				//For each output, draw a line (outputs copy the color of the parent gate)
+				for(LogicGate gateOut : gate.getOutputs()){
+					g2.setColor((gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
+					Point pointOut = gateOut.area.getLocation();
+					//The +1 is so that it looks like it's on the other side of the gate.
+					g2.drawLine((point.x+1)*this.scale, point.y*this.scale+(this.scale/2),
+							pointOut.x*this.scale, pointOut.y*this.scale);
+					/*
+					 * TODO
+					 * Idealy, I would want something that would do along the lines of...
+					 * (point.y*this.scale)+((this.scale/(numOfPorts+1))*(port+1)) 
+					 * Right now it draws it in the top right corner. ports are 0 based, so the +1 is needed
+					 * to bring it up from 0. Taking on an extra port makes it so it wouldn't touch the corner
+					 * (2 ports, 3 subsections).
+					 * 
+					 * An example would be 2 ports. +1 makes that 3, which the amount of subsections. Each
+					 * line would be drawn from inbetween each subsection, which would be 0, 1, 2, and 3.
+					 * 1 and 2 would correspond to the ports, which are normally stored as 0 and 1. This means
+					 * we would have to +1 them. Diving it by scale gives us actual pixel amounts.
+					 * The default code (pointOut.y*this.scale) already brings line to the top left corner, so
+					 * all it would be a matter of is translating it. which would just tack on the additional
+					 * pixels to the end.
+					 * 
+					 * This example is for inputs, but it can easily work for outputs too.
+					 */
+				}
 			}
 			if(this.currentPoint != null && this.currentGate != null){
 				g2.drawImage(this.currentGate.getImage(), this.currentPoint.x*this.scale,
@@ -133,7 +165,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 						(this.currentGate.getOutput(this.cycle) ?
 								this.currentGate.getColors().getOn() :
 									this.currentGate.getColors().getOff())
-						,null);
+						, null);
 			}
 		}
 	}
@@ -170,6 +202,9 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					}while(port < 0);
 					try{
 						this.currentGate.connectOutput(port, gate);
+						if(gate.getInputGate(port) != null){ 
+							gate.getInputGate(port).breakOutput(gate);
+						}
 						gate.connectInput(port, this.currentGate);
 						System.out.println("Connected");
 					}catch(IndexOutOfBoundsException e2){
@@ -198,6 +233,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	public void mouseDragged(MouseEvent e){
 		if(this.currentGate == null || this.special != Special.NONE) return;
 		this.currentPoint = this.scalePoint(e.getPoint());
+		this.currentGate.area.setLocation(this.currentPoint);
 	}
 
 	/*functionally the same as Mouse Dragged*/
@@ -206,6 +242,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 		if(this.special == Special.PLACE){
 			//if(this.currentGate == null) return; if we are in place mode then this should not be null.
 			this.currentPoint = this.scalePoint(e.getPoint());
+			this.currentGate.area.setLocation(this.currentPoint);
 		}
 	}
 

@@ -19,6 +19,7 @@ import main.simpleLogicGates.XOR_Gate;
 public class LBPLogicSimulator {
 	//public static final MainFrame mainFrame = new MainFrame();
 	public static final JFrame mainFrame = new JFrame("Logic Test");
+	public static final MainPanel2 mainPanel = new MainPanel2();
 	public static final ArrayList<LogicGate> gates = new ArrayList<>();
 	public static byte cycle = 0;
 	public static final Timer fpsTimer = new Timer("FPS Timer", true);
@@ -27,7 +28,6 @@ public class LBPLogicSimulator {
 		//halfGUI();
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(800, 600);
-		final MainPanel2 mainPanel = new MainPanel2();
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
 		fpsTimer.schedule(new TimerTask(){

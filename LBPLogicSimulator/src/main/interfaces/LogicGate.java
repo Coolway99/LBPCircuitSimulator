@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * The base class for all logic gates 
@@ -182,6 +183,14 @@ public abstract class LogicGate{
 	
 	public ColorSet getColors(){
 		return this.color;
+	}
+	
+	/**
+	 * A method for getting all the gates that this gate outputs to.
+	 * @return A set containing all the gates this outputs to.
+	 */
+	public Set<LogicGate> getOutputs(){
+		return this.outList.keySet();
 	}
 	
 	public void setColors(ColorSet colors){
