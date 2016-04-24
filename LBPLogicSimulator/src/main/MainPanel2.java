@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 
 import javax.swing.JMenuItem;
@@ -19,7 +21,7 @@ import javax.swing.SwingUtilities;
 
 import main.interfaces.ColorSet;
 import main.interfaces.LogicGate;
-import main.simpleLogicGates.AND_Gate2;
+import main.simpleLogicGates.AND_Gate;
 import main.simpleLogicGates.NOT_Gate;
 import main.simpleLogicGates.OR_Gate;
 import main.simpleLogicGates.XOR_Gate;
@@ -31,7 +33,8 @@ import main.simpleLogicGates.XOR_Gate;
  * It also holds the data for all the gates and updates them all.
  * @author Coolway99
  */
-public class MainPanel2 extends JPanel implements MouseListener, MouseMotionListener, ActionListener{
+public class MainPanel2 extends JPanel implements MouseListener, MouseMotionListener,
+		MouseWheelListener, ActionListener{
 	private static final long serialVersionUID = -2490678084136159574L;
 	
 	/**
@@ -86,10 +89,15 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	 */
 	private JPopupMenu gateMenu = new JPopupMenu();
 
+	/**
+	 * The point dictating the top-left of the viewport
+	 */
+	private Point viewPoint = new Point(0, 0);
+	
 	public MainPanel2(){
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-		this.gates.put(new Point(0, 0), new AND_Gate2());//TODO for testing only
+		this.addMouseWheelListener(this);
 		
 		this.addGateItem("Connect");
 		this.addGateItem("Disconnect");
@@ -124,48 +132,34 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 				LogicGate gate = this.gates.get(point);
 				ColorSet colors = gate.getColors();
 				//Get the image and scale it
-				g2.drawImage(gate.getImage(), point.x*this.scale,
-						point.y*this.scale, gate.area.width*this.scale,
-						gate.area.height*this.scale,
-						//Changes color based on it's digital state
-						(gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff())
-						//We don't have an image observer
-						, null);
+				this.drawImage(g2, gate, point, colors);
 				//For each output, draw a line (outputs copy the color of the parent gate)
+				//TODO Should this be moved above the gate drawing so all connections are below other gates?
+				/*TODO referencing above TODO. Drawing the gates and connections on separate images then
+				 * drawing the images onto the panel would work for this purpose. Alternatively use the panel
+				 * as one of the images. Draw all connections onto the panel and all gates onto an image, then draw
+				 * the image onto the panel
+				 */
 				for(LogicGate gateOut : gate.getOutputs()){
 					g2.setColor((gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
 					Point pointOut = gateOut.area.getLocation();
 					//The +1 is so that it looks like it's on the other side of the gate.
-					g2.drawLine((point.x+1)*this.scale, point.y*this.scale+(this.scale/2),
-							pointOut.x*this.scale, pointOut.y*this.scale);
-					/*
-					 * TODO
-					 * Idealy, I would want something that would do along the lines of...
-					 * (point.y*this.scale)+((this.scale/(numOfPorts+1))*(port+1)) 
-					 * Right now it draws it in the top right corner. ports are 0 based, so the +1 is needed
-					 * to bring it up from 0. Taking on an extra port makes it so it wouldn't touch the corner
-					 * (2 ports, 3 subsections).
-					 * 
-					 * An example would be 2 ports. +1 makes that 3, which the amount of subsections. Each
-					 * line would be drawn from inbetween each subsection, which would be 0, 1, 2, and 3.
-					 * 1 and 2 would correspond to the ports, which are normally stored as 0 and 1. This means
-					 * we would have to +1 them. Diving it by scale gives us actual pixel amounts.
-					 * The default code (pointOut.y*this.scale) already brings line to the top left corner, so
-					 * all it would be a matter of is translating it. which would just tack on the additional
-					 * pixels to the end.
-					 * 
-					 * This example is for inputs, but it can easily work for outputs too.
-					 */
+					//This would take more time checking see if it's an arraySize of one.
+					for(byte port : gate.getOutputPorts(gateOut)){
+						this.drawLine(g2, point, pointOut, gateOut.numOfIn, port);
+					}
 				}
 			}
 			if(this.currentPoint != null && this.currentGate != null){
-				g2.drawImage(this.currentGate.getImage(), this.currentPoint.x*this.scale,
-						this.currentPoint.y*this.scale, this.currentGate.area.width*this.scale,
-						this.currentGate.area.height*this.scale,
-						(this.currentGate.getOutput(this.cycle) ?
-								this.currentGate.getColors().getOn() :
-									this.currentGate.getColors().getOff())
-						, null);
+				ColorSet colors = this.currentGate.getColors();
+				this.drawImage(g2, this.currentGate, this.currentPoint, colors);
+				for(LogicGate gateOut : this.currentGate.getOutputs()){
+					g2.setColor((this.currentGate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
+					Point pointOut = gateOut.area.getLocation();
+					for(byte port : this.currentGate.getOutputPorts(gateOut)){
+						this.drawLine(g2, this.currentPoint, pointOut, this.currentGate.numOfIn, port);
+					}
+				}
 			}
 		}
 	}
@@ -177,6 +171,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 			case NONE:
 			default:{
 				Point point = this.scalePoint(e.getPoint());
+				point.translate(-2*this.viewPoint.x, -2*this.viewPoint.y);
 				LogicGate gate = this.gates.get(point);
 				if(gate != null){
 					this.currentGate = gate;
@@ -184,7 +179,15 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					this.currentPoint = point;
 				} else {
 					this.currentGate = null;
-					this.currentPoint = null;
+					//Begin trying to drag the view
+					/*
+					 * for T is the viewport, X is the change, and A is current point. If we make
+					 * A = 2*T - X. then when we update, A + X2 = 2*T2
+					 * Basically, 2*T = X + A
+					 */
+					//this.currentPoint = new Point(this.viewPoint.x - point.x, this.viewPoint.y - point.y);
+					this.currentPoint = new Point(-point.x, -point.y);
+					this.special = Special.DRAGGING;
 				}
 			}
 			break;
@@ -225,15 +228,32 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 				this.currentGate = null;
 				this.currentPoint = null;
 				this.special = Special.NONE;
+				break;
 			}
+			case DRAGGING:
+				//You shouldn't be here...
+				return;
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e){
-		if(this.currentGate == null || this.special != Special.NONE) return;
-		this.currentPoint = this.scalePoint(e.getPoint());
-		this.currentGate.area.setLocation(this.currentPoint);
+		switch(this.special){
+			case NONE:{
+				if(this.currentGate == null) return;
+				this.currentPoint = this.scalePoint(e.getPoint());
+				this.currentPoint.translate(-2*this.viewPoint.x, -2*this.viewPoint.y);
+				this.currentGate.area.setLocation(this.currentPoint);
+				break;
+			}
+			case DRAGGING:{
+				Point point = new Point(e.getX()/this.scale, e.getY()/this.scale);
+				this.viewPoint = new Point(point.x + this.currentPoint.x, point.y + this.currentPoint.y);
+				break;
+			}
+			default:
+				return;
+		}
 	}
 
 	/*functionally the same as Mouse Dragged*/
@@ -249,15 +269,27 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mouseReleased(MouseEvent e){
 		if(SwingUtilities.isLeftMouseButton(e)){
-			if(this.currentPoint != null && this.currentGate != null){
-				LogicGate gate = this.gates.get(this.currentPoint);
-				if(gate != null){
-					gate.delete(); //TODO In LBP, it's attempted to be "best-matched" port for port
+			switch(this.special){
+				case NONE:{
+					if(this.currentPoint != null && this.currentGate != null){
+						LogicGate gate = this.gates.get(this.currentPoint);
+						if(gate != null){
+							gate.delete(); //TODO In LBP, it's attempted to be "best-matched" port for port
+						}
+						this.gates.put(this.currentPoint, this.currentGate);
+						this.currentGate = null;
+						this.currentPoint = null;
+						this.special = Special.NONE;
+					}
+					break;
 				}
-				this.gates.put(this.currentPoint, this.currentGate);
-				this.currentGate = null;
-				this.currentPoint = null;
-				this.special = Special.NONE;
+				case DRAGGING:{
+					this.currentPoint = null;
+					this.special = Special.NONE;
+					break;
+				}
+				default:
+					return;
 			}
 		} else if(SwingUtilities.isRightMouseButton(e)){
 			if(this.currentGate == null && this.special == Special.NONE){
@@ -274,13 +306,24 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	@Override
+	public void mouseWheelMoved(MouseWheelEvent e){
+		if(e.getScrollType() != MouseWheelEvent.WHEEL_UNIT_SCROLL) return;
+		this.scale -= e.getUnitsToScroll();
+		if(this.scale <= 10){
+			this.scale = 11;
+		} else if(this.scale > 500){
+			this.scale = 500;
+		}
+	}
+
+	@Override
 	public void actionPerformed(ActionEvent e){
 		String name = ((JMenuItem) e.getSource()).getName();
 		try{
 			switch(name){
 				case("newANDGate"):
 					this.special = Special.PLACE;
-					this.currentGate = new AND_Gate2();
+					this.currentGate = new AND_Gate();
 					break;
 				case("newORGate"):
 					this.special = Special.PLACE;
@@ -340,9 +383,9 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	private Point scalePoint(Point point){
-		return new Point(point.x/this.scale, point.y/this.scale);
+		return new Point((point.x/this.scale)+this.viewPoint.x, (point.y/this.scale)+this.viewPoint.y);
 	}
-
+	
 	private void addPanelItem(String name, String identifier){
 		JMenuItem item = new JMenuItem(name);
 		item.setName(identifier);
@@ -355,6 +398,25 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 		item.setName(name.toLowerCase());
 		item.addActionListener(this);
 		this.gateMenu.add(item);
+	}
+	
+	private void drawImage(Graphics2D g2, LogicGate gate, Point location, ColorSet colors){
+		g2.drawImage(gate.getImage(),
+				(location.x+this.viewPoint.x)*this.scale,
+				(location.y+this.viewPoint.y)*this.scale,
+				gate.area.width*this.scale,
+				gate.area.height*this.scale,
+				//Changes color based on it's digital state
+				(gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff())
+				//We don't have an image observer
+				, null);
+	}
+	
+	private void drawLine(Graphics2D g2, Point A, Point B, int inputs, byte port){
+		g2.drawLine((A.x+1+this.viewPoint.x)*this.scale,
+				(A.y+this.viewPoint.y)*this.scale+(this.scale/2),
+				(B.x+this.viewPoint.x)*this.scale,
+				((B.y+this.viewPoint.y)*this.scale)+((this.scale/(inputs+1)*(port+1))));
 	}
 
 	@Override
@@ -389,5 +451,6 @@ enum Special{
 	CONNECT, //We are connecting 2 gates to eachother
 	DISCONNECT, //We are disconnecting 2 gates from eachother
 	PLACE, //We are placing down a brand new gate
+	DRAGGING, //We are dragging the view itself
 	;
 }

@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -11,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
 import main.interfaces.LogicGate;
-import main.simpleLogicGates.AND_Gate2;
+import main.simpleLogicGates.AND_Gate;
 import main.simpleLogicGates.NOT_Gate;
 import main.simpleLogicGates.OR_Gate;
 import main.simpleLogicGates.XOR_Gate;
@@ -20,15 +22,38 @@ public class LBPLogicSimulator {
 	//public static final MainFrame mainFrame = new MainFrame();
 	public static final JFrame mainFrame = new JFrame("Logic Test");
 	public static final MainPanel2 mainPanel = new MainPanel2();
+	public static final SubPanel subPanel = new SubPanel();
+	public static final GridBagLayout layout = new GridBagLayout();
 	public static final ArrayList<LogicGate> gates = new ArrayList<>();
 	public static byte cycle = 0;
 	public static final Timer fpsTimer = new Timer("FPS Timer", true);
 	public static final Timer updateTimer = new Timer("Update Timer", true);
 	public static void main(String[] Args){
+		//noGUI();
 		//halfGUI();
+		GUI();
+	}
+	
+	private static void GUI(){
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setSize(800, 600);
-		mainFrame.add(mainPanel);
+//		mainFrame.setSize(800, 600);
+		mainFrame.setSize(800, 800);
+		layout.columnWidths = new int[]{800, 200};
+		layout.rowHeights = new int[]{600};
+		mainFrame.setLayout(layout);
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		mainFrame.add(mainPanel, c);
+		
+		c.gridx = 1;
+		mainFrame.add(subPanel, c);
+		
+		mainFrame.pack();
+		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		fpsTimer.schedule(new TimerTask(){
 			@Override
@@ -147,7 +172,7 @@ public class LBPLogicSimulator {
 						System.out.print("Which Gate:>");
 						switch(scanner.nextLine().toUpperCase()){
 							case("AND"):
-								gate = new AND_Gate2();
+								gate = new AND_Gate();
 								break;
 							case("NOT"):
 								gate = new NOT_Gate();
