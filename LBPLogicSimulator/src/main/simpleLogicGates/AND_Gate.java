@@ -3,6 +3,7 @@ package main.simpleLogicGates;
 import java.awt.Image;
 
 import main.ResourceHelper;
+import main.interfaces.Invertable;
 import main.interfaces.LogicGate;
 
 /**
@@ -12,13 +13,22 @@ import main.interfaces.LogicGate;
  * If there's 2 negative or 2 positive inputs, the output is positive, otherwise negative.
  * @author Coolway99
  */
-public class AND_Gate2 extends LogicGate{
+public class AND_Gate extends LogicGate implements Invertable{
 	
 	private boolean output = false;
+	/**
+	 * Is this a NAND gate?
+	 */
+	private boolean inverted = false;
 	//private double analog = 0;
 	
-	public AND_Gate2(){
+	public AND_Gate(){
 		super(2);
+	}
+	
+	public AND_Gate(boolean inverted){
+		super(2);
+		this.inverted = inverted;
 	}
 	
 	@Override
@@ -31,6 +41,15 @@ public class AND_Gate2 extends LogicGate{
 			if(gate == null){
 				newOut = false;
 				//this.analog = 0;
+				//Copied from the old AND_Gate file. Might be useful
+				/*(!analog || getAnalog() == 0){
+						analog = false
+					} else if(Math.abs(getAnalog()) < lowestValue){
+						lowestValue = getAnalog();
+					}
+					if(!getDigital()){
+						digital = false;
+					}*/
 				break;
 			}
 			if(!gate.getOutput(cycle)){
@@ -38,7 +57,7 @@ public class AND_Gate2 extends LogicGate{
 				break;
 			}
 		}
-		this.output = newOut;
+		this.output = (this.inverted ? !newOut : newOut);
 		return false;
 	}
 	
@@ -50,7 +69,16 @@ public class AND_Gate2 extends LogicGate{
 
 	@Override
 	public Image getImage(){
-		return ResourceHelper.getImage("gateAND.png");
+		return ResourceHelper.getImage((this.inverted ? "gateNAND.png" :"gateAND.png"));
 	}
 	
+	@Override
+	public void invert(){
+		this.inverted = !this.inverted;
+	}
+	
+	@Override
+	public boolean getInverted(){
+		return this.inverted;
+	}
 }

@@ -150,14 +150,14 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					}
 				}
 			}
-			if(this.currentPoint != null && this.currentGate != null){
+			if(this.currentPoint != null && this.currentGate != null && this.special != Special.CONTEXT){
 				ColorSet colors = this.currentGate.getColors();
 				this.drawImage(g2, this.currentGate, this.currentPoint, colors);
 				for(LogicGate gateOut : this.currentGate.getOutputs()){
 					g2.setColor((this.currentGate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
 					Point pointOut = gateOut.area.getLocation();
 					for(byte port : this.currentGate.getOutputPorts(gateOut)){
-						this.drawLine(g2, this.currentPoint, pointOut, this.currentGate.numOfIn, port);
+						this.drawLine(g2, this.currentPoint, pointOut, gateOut.numOfIn, port);
 					}
 				}
 			}
@@ -168,11 +168,16 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 	public void mousePressed(MouseEvent e){
 		if(e.getButton() != MouseEvent.BUTTON1) return;
 		switch(this.special){
+			case CONTEXT:
+				this.currentGate = null;
+				this.currentPoint = null;
+				this.special = Special.NONE;
+				//$FALL-THROUGH$
 			case NONE:
 			default:{
 				Point point = this.scalePoint(e.getPoint());
-				point.translate(-2*this.viewPoint.x, -2*this.viewPoint.y);
 				LogicGate gate = this.gates.get(point);
+				LBPLogicSimulator.subPanel.configPanel.update(gate);
 				if(gate != null){
 					this.currentGate = gate;
 					this.gates.remove(point);
@@ -186,6 +191,10 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					 * Basically, 2*T = X + A
 					 */
 					//this.currentPoint = new Point(this.viewPoint.x - point.x, this.viewPoint.y - point.y);
+					/*
+					 * Son: "Dad, why does the sun rise in the east and set in the west?
+					 * Dad: "Shush, it works, don't touch it"
+					 */
 					this.currentPoint = new Point(-point.x, -point.y);
 					this.special = Special.DRAGGING;
 				}
@@ -194,13 +203,19 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 			case CONNECT:{
 				LogicGate gate = this.gates.get(this.scalePoint(e.getPoint()));
 				if(gate != null){
-					byte port = -1;
+					byte port = -2;
 					do{
 						try{
 							port = Byte.parseByte(JOptionPane.showInputDialog(
 									LBPLogicSimulator.mainFrame, "Which port?", 0));
 						} catch(NumberFormatException e2){
-							port = -1;
+							port = -2;
+						}
+						if(port == -1){
+							this.currentGate = null;
+							this.special = Special.NONE;
+							System.out.println("Canceled");
+							return;
 						}
 					}while(port < 0);
 					try{
@@ -242,11 +257,11 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 			case NONE:{
 				if(this.currentGate == null) return;
 				this.currentPoint = this.scalePoint(e.getPoint());
-				this.currentPoint.translate(-2*this.viewPoint.x, -2*this.viewPoint.y);
 				this.currentGate.area.setLocation(this.currentPoint);
 				break;
 			}
 			case DRAGGING:{
+				//We have to manually scale in order to prevent feedback
 				Point point = new Point(e.getX()/this.scale, e.getY()/this.scale);
 				this.viewPoint = new Point(point.x + this.currentPoint.x, point.y + this.currentPoint.y);
 				break;
@@ -293,6 +308,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 			}
 		} else if(SwingUtilities.isRightMouseButton(e)){
 			if(this.currentGate == null && this.special == Special.NONE){
+				this.special = Special.CONTEXT;
 				this.currentPoint = this.scalePoint(e.getPoint());
 				LogicGate gate = this.gates.get(this.currentPoint);
 				if(gate != null){
@@ -382,8 +398,13 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 		}
 	}
 	
+	/**
+	 * Scales the point then subtracts {@link #viewPoint}
+	 * @param point The point to scale
+	 * @return The scaled point, minus the {@link #viewPoint}
+	 */
 	private Point scalePoint(Point point){
-		return new Point((point.x/this.scale)+this.viewPoint.x, (point.y/this.scale)+this.viewPoint.y);
+		return new Point((point.x/this.scale)-this.viewPoint.x, (point.y/this.scale)-this.viewPoint.y);
 	}
 	
 	private void addPanelItem(String name, String identifier){
@@ -448,6 +469,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
  */
 enum Special{
 	NONE, //There is nothing special to do
+	CONTEXT, //We are in a context menu
 	CONNECT, //We are connecting 2 gates to eachother
 	DISCONNECT, //We are disconnecting 2 gates from eachother
 	PLACE, //We are placing down a brand new gate

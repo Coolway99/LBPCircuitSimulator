@@ -26,7 +26,6 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void init(){
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//setJMenuBar(this.menuBar);
 		this.add(this.mainPanel);
 		this.setSize(800, 600);

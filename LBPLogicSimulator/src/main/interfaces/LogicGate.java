@@ -97,11 +97,14 @@ public abstract class LogicGate{
 	 * @param port The input of the other gate
 	 * @param gate The other gate
 	 */
+	//TODO if connecting twice it glitches up.
 	public void connectOutput(byte port, LogicGate gate){
 		if(this.outList.get(gate) == null){
 			this.outList.put(gate, new ArrayList<Byte>());
 		}
-		this.outList.get(gate).add(port);
+		if(!this.outList.get(gate).contains(port)){
+			this.outList.get(gate).add(port);
+		}
 	}
 	
 	/**
