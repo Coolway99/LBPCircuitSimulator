@@ -3,8 +3,6 @@ package main.interfaces;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * The base class for all logic gates 
@@ -14,12 +12,7 @@ public abstract class LogicGate{
 	/**
 	 * This list is for storing the inputs of other gates
 	 */
-	protected ArrayList<LogicGate> inList = new ArrayList<>(2);
-	/**
-	 * This list is for storing what gates are expecting this one's output
-	 * <b>PUBLIC FOR TESTING</b>
-	 */
-	public HashMap<LogicGate, ArrayList<Byte>> outList = new HashMap<>();
+	private ArrayList<LogicGate> inList = new ArrayList<>(2);
 	
 	/**
 	 * The number of inputs this gate has
@@ -42,6 +35,13 @@ public abstract class LogicGate{
 	 * under the chip
 	 */
 	private ColorSet color = ColorSet.DEFAULT;
+	
+	/**
+	 * A variable to test if this gate is deleted. If it is deleted any calls to this gate from others
+	 * will just wipe it from their memory.
+	 * TODO find a better way
+	 */
+	private boolean deleted = false;
 	
 	/**
 	 * A constructor that converts inputs to <b>byte</b> and then calls {@link #LogicGate2(byte)}
@@ -93,34 +93,11 @@ public abstract class LogicGate{
 	}
 	
 	/**
-	 * Connect the output of this gate to the input of another gate
-	 * @param port The input of the other gate
-	 * @param gate The other gate
-	 */
-	//TODO if connecting twice it glitches up.
-	public void connectOutput(byte port, LogicGate gate){
-		if(this.outList.get(gate) == null){
-			this.outList.put(gate, new ArrayList<Byte>());
-		}
-		if(!this.outList.get(gate).contains(port)){
-			this.outList.get(gate).add(port);
-		}
-	}
-	
-	/**
 	 * Clears the specified port, "removing" any gates from it 
 	 * @param port The port to clear
 	 */
 	public void breakInput(byte port){
 		this.inList.set(port, null);
-	}
-	
-	/**
-	 * Removes the gate, preventing it from receiving signals anymore
-	 * @param gate The gate to remove
-	 */
-	public void breakOutput(LogicGate gate){
-		this.outList.remove(gate);
 	}
 	
 	/**
@@ -131,41 +108,44 @@ public abstract class LogicGate{
 	 * You cannot expect garbage collection to automatically call {@link #finalize()}
 	 */
 	public void delete(){
-		for(LogicGate gate : this.inList){
-			if(gate == null) continue;
-			gate.breakOutput(this);
-		}
-		for(LogicGate gate : this.outList.keySet()){
+		/*for(LogicGate gate : this.outList.keySet()){
 			if(gate == null) continue;
 			ArrayList<Byte> ports = this.getOutputPorts(gate);
 			for(Byte port : ports){
 				gate.breakInput(port);
 			}
-		}
+		}*/
+		this.deleted = true;
+	}
+	
+	public boolean isDeleted(){
+		return this.deleted;
 	}
 
 	/**
-	 * Returns the gate who's output is connect this gate's input
+	 * Returns the gate who's output is connect this gate's input<br>
+	 * <br>
+	 * This method automatically checks if {@link #isDeleted()} returns true.
+	 * It will return a null and automatically remove the gate from the port.
+	 * Otherwise, it will return the gate
 	 * @param port The port to look at
-	 * @return The gate connected, or null if nonexistent
+	 * @return The gate connected, or null if nonexistent or deleted
 	 */
 	public LogicGate getInputGate(byte port){
-		return this.inList.get(port);
-	}
-
-	/**
-	 * Returns an ArrayList of all the ports this gate's output is connect to the other gate's input
-	 * @param gate The gate to get all the ports for
-	 * @return An ArrayList containing all the ports
-	 */
-	public ArrayList<Byte> getOutputPorts(LogicGate gate){
-		return this.outList.get(gate);
+		LogicGate gate = this.inList.get(port);
+		if(gate != null && gate.isDeleted()){
+			this.inList.set(port, null);
+			return null;
+		}
+		return gate;
 	}
 
 	/**
 	 * Updates the gate. If the cycle matches the previous one, do not update.
 	 * If it needs to update it's inputs, it will do so.
 	 * It can be a byte because all it detects is change, so if the byte overflows then it's still a change
+	 * Be careful with gates that are deleted. You should check if {@link #isDeleted()} is true, if so, act
+	 * like the gate doesn't exist and remove it from your memory
 	 * @param cycle The "cycle" of the program, to prevent it updating more than once per tick
 	 * @return Was it already updated?
 	 */
@@ -186,14 +166,6 @@ public abstract class LogicGate{
 	
 	public ColorSet getColors(){
 		return this.color;
-	}
-	
-	/**
-	 * A method for getting all the gates that this gate outputs to.
-	 * @return A set containing all the gates this outputs to.
-	 */
-	public Set<LogicGate> getOutputs(){
-		return this.outList.keySet();
 	}
 	
 	public void setColors(ColorSet colors){

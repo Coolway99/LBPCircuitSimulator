@@ -24,7 +24,8 @@ public class XOR_Gate extends LogicGate{
 		if(cycle == this.lastUpdated) return true;
 		this.lastUpdated = cycle;
 		boolean newOut = false;
-		for(LogicGate gate : this.inList){
+		for(byte port = 0; port < this.numOfIn; port++){
+			LogicGate gate = this.getInputGate(port);
 			if(gate != null && gate.getOutput(cycle)){
 				newOut = !newOut;
 			}

@@ -140,7 +140,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 				 * as one of the images. Draw all connections onto the panel and all gates onto an image, then draw
 				 * the image onto the panel
 				 */
-				for(LogicGate gateOut : gate.getOutputs()){
+				/*for(LogicGate gateOut : gate.getOutputs()){
 					g2.setColor((gate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
 					Point pointOut = gateOut.area.getLocation();
 					//The +1 is so that it looks like it's on the other side of the gate.
@@ -148,17 +148,31 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					for(byte port : gate.getOutputPorts(gateOut)){
 						this.drawLine(g2, point, pointOut, gateOut.numOfIn, port);
 					}
+				}*/
+				for(byte x = 0; x < gate.numOfIn; x++){
+					LogicGate gateIn = gate.getInputGate(x);
+					if(gateIn == null) continue;
+					g2.setColor(gateIn.getOutput(this.cycle) ? gateIn.getColors().getOn() : gateIn.getColors().getOff());
+					Point pointIn = gateIn.area.getLocation();
+					this.drawLine(g2, pointIn, point, gate.numOfIn, x);
 				}
 			}
 			if(this.currentPoint != null && this.currentGate != null && this.special != Special.CONTEXT){
 				ColorSet colors = this.currentGate.getColors();
 				this.drawImage(g2, this.currentGate, this.currentPoint, colors);
-				for(LogicGate gateOut : this.currentGate.getOutputs()){
+				/*for(LogicGate gateOut : this.currentGate.getOutputs()){
 					g2.setColor((this.currentGate.getOutput(this.cycle) ? colors.getOn() : colors.getOff()));
 					Point pointOut = gateOut.area.getLocation();
 					for(byte port : this.currentGate.getOutputPorts(gateOut)){
 						this.drawLine(g2, this.currentPoint, pointOut, gateOut.numOfIn, port);
 					}
+				}*/
+				for(byte x = 0; x < this.currentGate.numOfIn; x++){
+					LogicGate gateIn = this.currentGate.getInputGate(x);
+					if(gateIn == null) continue;
+					g2.setColor(gateIn.getOutput(this.cycle) ? gateIn.getColors().getOn() : gateIn.getColors().getOff());
+					Point pointIn = gateIn.area.getLocation();
+					this.drawLine(g2, pointIn, this.currentPoint, this.currentGate.numOfIn, x);
 				}
 			}
 		}
@@ -219,10 +233,6 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 						}
 					}while(port < 0);
 					try{
-						this.currentGate.connectOutput(port, gate);
-						if(gate.getInputGate(port) != null){ 
-							gate.getInputGate(port).breakOutput(gate);
-						}
 						gate.connectInput(port, this.currentGate);
 						System.out.println("Connected");
 					}catch(IndexOutOfBoundsException e2){
@@ -240,6 +250,7 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 					gate.delete(); //TODO In LBP, it's attempted to be "best-matched" port for port
 				}
 				this.gates.put(this.currentPoint, this.currentGate);
+				this.currentGate.area.setLocation(this.currentPoint);
 				this.currentGate = null;
 				this.currentPoint = null;
 				this.special = Special.NONE;
@@ -364,10 +375,6 @@ public class MainPanel2 extends JPanel implements MouseListener, MouseMotionList
 						}
 					}while(port < 0);
 					try{
-						LogicGate gate = this.currentGate.getInputGate(port);
-						if(gate != null){
-							gate.breakOutput(this.currentGate);
-						}
 						this.currentGate.breakInput(port);
 
 						System.out.println("Disconnected");

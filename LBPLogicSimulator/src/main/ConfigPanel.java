@@ -30,6 +30,7 @@ public class ConfigPanel extends JPanel implements ActionListener{
 		this.c.gridwidth = 3;
 		this.add(this.invert, this.c);
 		this.invert.addActionListener(this);
+		this.invert.setEnabled(false);
 	}
 	
 	private void initC(){

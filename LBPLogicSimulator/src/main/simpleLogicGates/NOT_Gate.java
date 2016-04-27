@@ -25,8 +25,12 @@ public class NOT_Gate extends LogicGate{
 		if(cycle == this.lastUpdated) return true;
 		this.lastUpdated = cycle;
 		//There can only be one possible input
-		LogicGate in = this.inList.get(0);
-		if(in == null || !in.getOutput(cycle)){
+		LogicGate in = this.getInputGate((byte) 0);
+		if(in == null){
+			this.output = true;
+			return false;
+		}
+		if(!in.getOutput(cycle)){
 			this.output = true;
 		} else {
 			this.output = false;

@@ -139,18 +139,6 @@ public class LBPLogicSimulator {
 							}
 							System.out.println("Has Gate "+gates.indexOf(gateIN)+" on input "+y);
 						}
-						if(gate.outList.isEmpty()){
-							System.out.println("Contains no outputs");
-						} else {
-							for(LogicGate gateOUT : gate.outList.keySet()){
-								System.out.print("Currently is outputing to gate "
-										+gates.indexOf(gateOUT)+" on input(s) ");
-								for(Byte port : gate.outList.get(gateOUT)){
-									System.out.print(port.byteValue()+" ");
-								}
-								System.out.println();
-							}
-						}
 					}
 					break;
 				}
@@ -226,7 +214,6 @@ public class LBPLogicSimulator {
 						LogicGate gateTo = gates.get(num);
 						System.out.print("Which port:>");
 						byte port = scanner.nextByte();
-						gateFrom.connectOutput(port, gateTo);
 						gateTo.connectInput(port, gateFrom);
 						System.out.println("Done");
 					}catch(InputMismatchException e){
@@ -244,9 +231,7 @@ public class LBPLogicSimulator {
 						System.out.print("Which port:>");
 						byte port = scanner.nextByte();
 						LogicGate gate = gates.get(num);
-						LogicGate gateOUT = gate.getInputGate(port);
 						gate.breakInput(port);
-						gateOUT.breakOutput(gate);
 						System.out.println("Done");
 					}catch(InputMismatchException e){
 						System.out.println("Not a number!");

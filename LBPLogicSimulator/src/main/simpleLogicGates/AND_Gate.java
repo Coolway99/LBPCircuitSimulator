@@ -37,7 +37,8 @@ public class AND_Gate extends LogicGate implements Invertable{
 		this.lastUpdated = cycle;
 		boolean newOut = true;
 		//this.analog = 100;
-		for(LogicGate gate : this.inList){
+		for(byte port = 0; port < this.numOfIn; port++){
+			LogicGate gate = this.getInputGate(port);
 			if(gate == null){
 				newOut = false;
 				//this.analog = 0;
